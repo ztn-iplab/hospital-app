@@ -13,7 +13,8 @@ class Config:
 
     # ✅ JWT Configuration for Cookie-based Auth
     JWT_TOKEN_LOCATION = ["cookies"]
-    JWT_ACCESS_COOKIE_NAME = "access_token"
+    # Use same cookie name for all manual token handling routes
+    JWT_ACCESS_COOKIE_NAME = "access_token_cookie"
     JWT_COOKIE_CSRF_PROTECT = False  # Optional: Enable for CSRF protection if needed
     JWT_ACCESS_COOKIE_PATH = "/"     # Make token available across the app
     JWT_COOKIE_SECURE = False        # Set to True in production with HTTPS

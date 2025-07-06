@@ -1,5 +1,6 @@
 // ✅ Auto-refresh access token silently
-const AUTO_REFRESH_INTERVAL = 60 * 60 * 1000; // every 5 mins
+// Refresh the token every 5 minutes
+const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000;
 
 setInterval(() => {
   fetch("/auth/refresh", {
@@ -16,6 +17,6 @@ setInterval(() => {
     })
     .catch((err) => {
       console.error("❌ Refresh error:", err);
-      window.location.href = "/login";
+      window.location.href = "/auth/login";
     });
 }, AUTO_REFRESH_INTERVAL);

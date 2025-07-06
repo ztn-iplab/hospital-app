@@ -35,6 +35,8 @@ def login():
                 session["access_token"] = data["access_token"]
                 session["role"] = data.get("role")
                 session["user_id"] = data.get("user_id")
+                # Forward IAM issued cookies to the browser if present
+                refresh_cookie = response.cookies.get("refresh_token_cookie")
 
                 # ✅ Store MFA flags in session
                 session["require_totp"] = data.get("require_totp", False)
@@ -55,14 +57,33 @@ def login():
                 # 🧠 Role-based dashboard
                 role = data.get("role")
                 if role == "admin":
-                    return redirect(url_for("dashboard.admin_dashboard"))
+                    dashboard_url = url_for("dashboard.admin_dashboard")
                 elif role == "doctor":
-                    return redirect(url_for("dashboard.doctor_dashboard"))
+                    dashboard_url = url_for("dashboard.doctor_dashboard")
                 elif role == "nurse":
-                    return redirect(url_for("dashboard.nurse_dashboard"))
+                    dashboard_url = url_for("dashboard.nurse_dashboard")
                 else:
                     flash("Unknown role.", "danger")
                     return redirect(url_for("auth.login"))
+
+                resp = make_response(redirect(dashboard_url))
+                # set cookie for API calls
+                resp.set_cookie(
+                    "access_token_cookie",
+                    data["access_token"],
+                    httponly=True,
+                    samesite="Lax",
+                    secure=False,
+                )
+                if refresh_cookie:
+                    resp.set_cookie(
+                        "refresh_token_cookie",
+                        refresh_cookie,
+                        httponly=True,
+                        samesite="Lax",
+                        secure=False,
+                    )
+                return resp
             else:
                 flash(data.get("error", "Login failed."), "danger")
                 return redirect(url_for("auth.login"))
